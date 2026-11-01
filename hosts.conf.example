@@ -2,3 +2,5 @@
 # interval = 10
 server1.example.com
 server2.example.com
+# iTerm2 profile whose hotkey window is used for "ssh" clicks (default: first profile with a hotkey)
+# iterm_profile = hotkey

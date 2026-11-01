@@ -16,10 +16,11 @@ cat > "$APP/Contents/Info.plist" <<PLIST
   <key>CFBundleShortVersionString</key><string>0.1</string>
   <key>LSMinimumSystemVersion</key><string>13.0</string>
   <key>LSUIElement</key><true/>
+  <key>NSAppleEventsUsageDescription</key><string>Open ssh sessions in iTerm2.</string>
 </dict></plist>
 PLIST
 if [ -f hosts.conf ]; then mkdir -p "$APP/Contents/Resources"; cp hosts.conf "$APP/Contents/Resources/"; else echo "warning: no hosts.conf (see hosts.conf.example)"; fi
-codesign -s - --force "$APP" >/dev/null 2>&1 || true
+codesign -s - --force -r='designated => identifier "com.haitongma.servermonitor"' "$APP" >/dev/null 2>&1 || true
 echo "built $PWD/$APP"
 if [ "$1" = "--install" ]; then
   mkdir -p ~/Applications

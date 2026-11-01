@@ -5,6 +5,7 @@ A tiny macOS menu bar app that monitors remote Linux GPU servers over SSH.
 - Menu bar shows average GPU utilization per host (`×` = unreachable)
 - Dropdown shows, per host: CPU, memory, root disk, and per-GPU utilization / VRAM / temperature / which users hold VRAM
 - Refreshes every 10 s; one SSH call per host, nothing to install on the servers
+- Click a host name to open `ssh <host>` in a new tab of your iTerm2 hotkey window
 - "Open at Login" toggle
 
 ## Requirements
@@ -30,3 +31,10 @@ Then:
 ./build.sh            # build ServerMonitor.app in place
 ./build.sh --install  # build, copy to ~/Applications and launch
 ```
+
+## iTerm2 hotkey window
+
+Clicking a host opens a new tab in the iTerm2 hotkey window (the first profile with a hotkey, or
+`iterm_profile = <name>` in `hosts.conf`). macOS will ask for **Automation** permission to control iTerm2.
+If the hotkey window can't be reached via AppleScript, the app presses its hotkey to reveal it, which needs
+**Accessibility** permission. Logs: `~/Library/Logs/ServerMonitor.log`.
