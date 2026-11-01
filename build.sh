@@ -18,6 +18,7 @@ cat > "$APP/Contents/Info.plist" <<PLIST
   <key>LSUIElement</key><true/>
 </dict></plist>
 PLIST
+if [ -f hosts.conf ]; then mkdir -p "$APP/Contents/Resources"; cp hosts.conf "$APP/Contents/Resources/"; else echo "warning: no hosts.conf (see hosts.conf.example)"; fi
 codesign -s - --force "$APP" >/dev/null 2>&1 || true
 echo "built $PWD/$APP"
 if [ "$1" = "--install" ]; then

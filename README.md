@@ -15,7 +15,16 @@ A tiny macOS menu bar app that monitors remote Linux GPU servers over SSH.
 
 ## Usage
 
-Edit `HOSTS` / `INTERVAL` at the top of `main.swift`, then:
+Create your host list (git-ignored):
+
+```bash
+cp hosts.conf.example hosts.conf   # then edit: one ssh host per line, optional `interval = 10`
+```
+
+`build.sh` bundles `hosts.conf` into the app. Alternatively put it at
+`~/.config/servermonitor/hosts.conf`, which takes precedence and needs no rebuild (just restart the app).
+
+Then:
 
 ```bash
 ./build.sh            # build ServerMonitor.app in place

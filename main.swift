@@ -2,8 +2,24 @@ import Cocoa
 import ServiceManagement
 
 // ===== 配置 =====
-let HOSTS = ["10.243.49.215", "10.243.49.216", "10.243.49.217"]
-let INTERVAL: TimeInterval = 10   // 刷新间隔（秒）
+// 读取顺序：~/.config/servermonitor/hosts.conf，其次 app 包内的 hosts.conf（build.sh 从仓库根目录拷入）
+// 格式：每行一个 ssh host（可用 ~/.ssh/config 里的别名），# 为注释，`interval = 秒` 设置刷新间隔
+let CONFIG_PATHS = [NSHomeDirectory() + "/.config/servermonitor/hosts.conf",
+                    Bundle.main.path(forResource: "hosts", ofType: "conf")].compactMap { $0 }
+
+func loadConfig() -> (hosts: [String], interval: TimeInterval) {
+    var hosts: [String] = [], interval: TimeInterval = 10
+    guard let text = CONFIG_PATHS.lazy.compactMap({ try? String(contentsOfFile: $0, encoding: .utf8) }).first else { return (hosts, interval) }
+    for raw in text.split(separator: "\n") {
+        let line = raw.split(separator: "#", maxSplits: 1, omittingEmptySubsequences: false).first.map(String.init)?
+            .trimmingCharacters(in: .whitespaces) ?? ""
+        if line.isEmpty { continue }
+        let kv = line.split(separator: "=").map { $0.trimmingCharacters(in: .whitespaces) }
+        if kv.count == 2, kv[0] == "interval" { interval = max(2, TimeInterval(kv[1]) ?? 10) } else { hosts.append(line) }
+    }
+    return (hosts, interval)
+}
+let (HOSTS, INTERVAL) = loadConfig()
 
 // 在远端执行的命令：一次 ssh 拿到 CPU / 内存 / 磁盘 / GPU / GPU 进程归属
 let REMOTE = """
@@ -152,6 +168,10 @@ class App: NSObject, NSApplicationDelegate, NSMenuDelegate {
     func rebuild() {
         guard let menu = item.menu else { return }
         menu.removeAllItems()
+        if HOSTS.isEmpty {
+            add(Line().t("No hosts configured. Create ~/.config/servermonitor/hosts.conf", .systemRed), menu)
+            menu.addItem(.separator())
+        }
         for h in HOSTS {
             let head = Line().t(h, bold: true)
             guard let s = stats[h] else { add(head.t("   loading…", .secondaryLabelColor), menu); menu.addItem(.separator()); continue }

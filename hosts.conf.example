@@ -1,0 +1,4 @@
+# One SSH host per line (IP, hostname, or ~/.ssh/config alias). Lines starting with # are comments.
+# interval = 10
+server1.example.com
+server2.example.com
